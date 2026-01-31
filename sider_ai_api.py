@@ -16,6 +16,10 @@ ORIGIN="chrome-extension://dhoenijjpgpeimemopealfcbiecgceod"
 TIMEZONE="Asia/Shanghai"
 APP_NAME="ChitChat_Edge_Ext"
 APP_VERSION="4.40.0"
+WEB_APP_NAME="ChitChat_Web"
+WEB_APP_VERSION="1.0.0"
+WEB_ORIGIN="https://sider.ai"
+WEB_IMAGE_REFERER="https://sider.ai/zh-CN/create/image/ai-image-generator"
 
 DEFAULT_TOKEN_FILE="_token.json"
 COOKIE_TEMPLATE='token=Bearer%20{token}; '
@@ -106,6 +110,15 @@ def upload_image(filename,header):
     else:
         data=response.content
     return json.loads(data.decode("utf-8"))
+
+def _download_file(url,output_path,cookies=None):
+    with requests.get(url, stream=True, cookies=cookies) as r:
+        r.raise_for_status()
+        with open(output_path,"wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+    return output_path
 
 class Session:
     def __init__(self,token=None,context_id="",cookie=None,update_info_at_init=True):
@@ -304,6 +317,57 @@ class Session:
             return self.get_text(url,self.header,payload)
         else:
             return "".join(self.get_text(url,self.header,payload))
+    def generate_image(self,prompt,engine="sd3-medium",samples=1,
+                       aspect_ratio="1:1",negative_prompt="",cid=None,
+                       app_name=WEB_APP_NAME,app_version=WEB_APP_VERSION,
+                       tz_name=TIMEZONE,referer=WEB_IMAGE_REFERER,
+                       endpoint="https://sider.ai/api/v1/image/text-to-image",
+                       save=False,output_dir=".",filename=None):
+        # 生成图片，返回JSON数据
+        url=endpoint
+        header=self.header.copy()
+        header["Origin"]=WEB_ORIGIN
+        header["Referer"]=referer
+        header["Accept"]="application/json, text/plain, */*"
+        header["content-type"]="application/json"
+        payload={
+            "negative_prompt": negative_prompt,
+            "cid": self.context_id if cid is None else cid,
+            "prompt": prompt,
+            "engine": engine,
+            "samples": samples,
+            "aspect_ratio": aspect_ratio,
+            "tz_name": tz_name,
+            "app_name": app_name,
+            "app_version": app_version
+        }
+        response=requests.post(url,headers=header,json=payload)
+        if response.status_code!=200:
+            raise Exception({"error": response.status_code, "message": response.text[:1024]})
+        data=response.json()
+        if save:
+            self.save_image_from_response(data,output_dir=output_dir,filename=filename)
+        return data
+
+    def save_image_from_response(self,data,output_dir=".",filename=None,index=0):
+        # 从生成图片的响应中保存第一张图片到本地
+        try:
+            image=data["data"]["images"][index]
+            url=image["url"]
+        except Exception:
+            raise ValueError("Invalid response data: missing images")
+        signed=data["data"].get("signed_cookie",{})
+        cookies={}
+        for c in signed.get("customDomainCookies",[]):
+            if "Name" in c and "Value" in c:
+                cookies[c["Name"]]=c["Value"]
+        if filename is None:
+            filename=os.path.basename(url.split("?")[0])
+        output_dir=normpath(output_dir)
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir,exist_ok=True)
+        output_path=os.path.join(output_dir,filename)
+        return _download_file(url,output_path,cookies=cookies)
     def search(self,content,model="gpt-4o-mini",stream=True,focus=None):
         # focus为字符串列表，包含搜索网站的域名，如"wikipedia.org"或"youtube.com"等
         url="https://api3.sider.ai/api/v2/completion/text"

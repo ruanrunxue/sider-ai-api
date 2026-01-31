@@ -44,6 +44,22 @@ def __init__(self,token=None,context_id="",cookie=None):
 
 - **返回**: 一个字符串生成器，逐步返回 AI 的响应。
 
+##### `generate_image(prompt, engine="sd3-medium")`
+
+文本生成图片，返回 JSON 数据（包含图片 URL 等）。
+
+- **参数**:
+  - `prompt` (str): 图像提示词。
+  - `engine` (str): 图片模型引擎，默认为 `"sd3-medium"`。
+  - `samples` (int): 生成张数，默认 1。
+  - `aspect_ratio` (str): 宽高比，如 `"1:1"`。
+  - `negative_prompt` (str): 负面提示词，默认空字符串。
+  - `save` (bool): 是否保存到本地，默认 False。
+  - `output_dir` (str): 保存目录，默认当前目录 `"."`。
+  - `filename` (str): 保存文件名（可选）。
+
+- **返回**: JSON 数据，`data.images` 中包含生成图片信息。
+
 #### 属性:
 
 - `context_id`: 对话上下文id，如果为`""`则表示开始新对话。对话上下文会由服务器端保存。  
@@ -63,6 +79,12 @@ print("".join(session.chat("Hello, Gemini!", "gemini-2.0-flash")))
 print("".join(session.chat("Hello, DeepSeek!", "deepseek-chat")))  # DeepSeek-v3
 print("".join(session.chat("Hello, o1!", "o1")))
 print("".join(session.ocr("path/to/image.jpg"))) # OCR
+res = session.generate_image(
+    prompt="金渐层猫咪，写实风格",
+    engine="sd3-medium",
+    save=True,
+    output_dir="."
+)
 print(f"还剩{session.remain}/{session.total}次API调用。")
 ```
 
@@ -117,6 +139,22 @@ Perform OCR (Optical Character Recognition) on an image file. Returns a string g
 
 - **Returns**: A string generator that progressively yields the OCR result.
 
+##### `generate_image(prompt, engine="sd3-medium")`
+
+Generate images from text and return JSON data (including image URLs).
+
+- **Parameters**:
+  - `prompt` (str): The image prompt.
+  - `engine` (str): Image engine, default `"sd3-medium"`.
+  - `samples` (int): Number of images, default 1.
+  - `aspect_ratio` (str): Aspect ratio, e.g. `"1:1"`.
+  - `negative_prompt` (str): Negative prompt, default empty.
+  - `save` (bool): Save to local disk, default False.
+  - `output_dir` (str): Output directory, default `"."`.
+  - `filename` (str): Output filename (optional).
+
+- **Returns**: JSON data; `data.images` contains generated image info.
+
 #### Attributes:
 
 - `context_id`: The conversation context ID. If it is `""`, it indicates starting a new conversation. The conversation context is stored on the server side.  
@@ -136,6 +174,12 @@ print("".join(session.chat("Hello, Gemini!", "gemini-2.0-flash")))
 print("".join(session.chat("Hello, DeepSeek!", "deepseek-chat")))  # DeepSeek-v3
 print("".join(session.chat("Hello, o1!", "o1")))
 print("".join(session.ocr("path/to/image.jpg")))  # OCR
+res = session.generate_image(
+    prompt="A golden shaded kitten, photorealistic",
+    engine="sd3-medium",
+    save=True,
+    output_dir="."
+)
 print(f"Remaining {session.remain}/{session.total} API calls.")
 ```
 
