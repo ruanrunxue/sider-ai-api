@@ -44,13 +44,13 @@ def __init__(self,token=None,context_id="",cookie=None):
 
 - **返回**: 一个字符串生成器，逐步返回 AI 的响应。
 
-##### `generate_image(prompt, engine="sd3-medium")`
+##### `generate_image(prompt, engine="sd3.5-large")`
 
 文本生成图片，返回 JSON 数据（包含图片 URL 等）。
 
 - **参数**:
   - `prompt` (str): 图像提示词。
-  - `engine` (str): 图片模型引擎，默认为 `"sd3-medium"`。
+  - `engine` (str): 图片模型引擎，默认为 `"sd3.5-large"`。
   - `samples` (int): 生成张数，默认 1。
   - `aspect_ratio` (str): 宽高比，如 `"1:1"`。
   - `negative_prompt` (str): 负面提示词，默认空字符串。
@@ -81,7 +81,7 @@ print("".join(session.chat("Hello, o1!", "o1")))
 print("".join(session.ocr("path/to/image.jpg"))) # OCR
 res = session.generate_image(
     prompt="金渐层猫咪，写实风格",
-    engine="sd3-medium",
+    engine="sd3.5-large",
     save=True,
     output_dir="."
 )
@@ -139,13 +139,13 @@ Perform OCR (Optical Character Recognition) on an image file. Returns a string g
 
 - **Returns**: A string generator that progressively yields the OCR result.
 
-##### `generate_image(prompt, engine="sd3-medium")`
+##### `generate_image(prompt, engine="sd3.5-large")`
 
 Generate images from text and return JSON data (including image URLs).
 
 - **Parameters**:
   - `prompt` (str): The image prompt.
-  - `engine` (str): Image engine, default `"sd3-medium"`.
+  - `engine` (str): Image engine, default `"sd3.5-large"`.
   - `samples` (int): Number of images, default 1.
   - `aspect_ratio` (str): Aspect ratio, e.g. `"1:1"`.
   - `negative_prompt` (str): Negative prompt, default empty.
@@ -176,7 +176,7 @@ print("".join(session.chat("Hello, o1!", "o1")))
 print("".join(session.ocr("path/to/image.jpg")))  # OCR
 res = session.generate_image(
     prompt="A golden shaded kitten, photorealistic",
-    engine="sd3-medium",
+    engine="sd3.5-large",
     save=True,
     output_dir="."
 )

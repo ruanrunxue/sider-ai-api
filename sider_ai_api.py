@@ -317,7 +317,7 @@ class Session:
             return self.get_text(url,self.header,payload)
         else:
             return "".join(self.get_text(url,self.header,payload))
-    def generate_image(self,prompt,engine="sd3-medium",samples=1,
+    def generate_image(self,prompt,engine="sd3.5-large",samples=1,
                        aspect_ratio="1:1",negative_prompt="",cid=None,
                        app_name=WEB_APP_NAME,app_version=WEB_APP_VERSION,
                        tz_name=TIMEZONE,referer=WEB_IMAGE_REFERER,
